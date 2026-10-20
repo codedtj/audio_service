@@ -315,6 +315,12 @@ public class AudioService extends MediaBrowserServiceCompat {
         configure(new AudioServiceConfig(getApplicationContext()));
 
         mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_QUEUE_COMMANDS);
+        // Keep the Next slot empty while MediaControl.skipToNext is absent, so
+        // a custom action (e.g. Like) does not slide into it on Android 13+
+        // SystemUI and Android Auto and jump back when Next returns.
+        Bundle sessionExtras = new Bundle();
+        sessionExtras.putBoolean(MediaConstants.SESSION_EXTRAS_KEY_SLOT_RESERVATION_SKIP_TO_NEXT, true);
+        mediaSession.setExtras(sessionExtras);
         PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
                 .setActions(AUTO_ENABLED_ACTIONS);
         mediaSession.setPlaybackState(stateBuilder.build());
